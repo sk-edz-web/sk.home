@@ -3,7 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>SK.SHOP · App Store</title>
+  
+  <title>SK Shop | SK Web App - Professional Web Store</title>
+  <meta name="description" content="Welcome to SK Shop and SK Web App. We provide high-quality digital solutions, web development, and local services in Tiruchirappalli.">
+  <meta name="keywords" content="SK Shop, SK Web App, Sarathi Kannan, Web Developer Trichy, Digital Menu App, SK Web Store">
+  <meta name="author" content="Sarathi Kannan">
+
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
   <style>
@@ -39,6 +47,7 @@
     
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
       <div class="flex items-center">
+        <img src="logo.png" alt="SK Shop Logo" class="w-10 h-10 mr-3 rounded-lg shadow-sm" onerror="this.style.display='none'">
         <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight">
           <span class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent animate-pulse" style="animation-duration: 4s;">
             SK.SHOP
@@ -53,16 +62,16 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
-        <input type="text" id="searchInput" placeholder="Search apps, categories..." class="w-full pl-12 pr-5 py-3.5 rounded-2xl border border-gray-200/80 bg-white/90 backdrop-blur-sm shadow-sm text-base placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-purple-200/70 focus:border-purple-300 transition-all duration-200" autocomplete="off" />
+        <input type="text" id="searchInput" placeholder="Search apps (e.g. SK Shop)..." class="w-full pl-12 pr-5 py-3.5 rounded-2xl border border-gray-200/80 bg-white/90 backdrop-blur-sm shadow-sm text-base placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-purple-200/70 focus:border-purple-300 transition-all duration-200" autocomplete="off" />
         <button id="clearSearch" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 hidden">✕</button>
       </div>
     </div>
 
     <div class="flex flex-wrap gap-2 mb-6">
-      <span class="bg-white/80 px-4 py-1.5 rounded-full text-sm font-medium text-gray-700 shadow-sm border border-gray-100">All apps</span>
-      <span class="bg-white/50 px-4 py-1.5 rounded-full text-sm text-gray-500 border border-gray-100">Productivity</span>
-      <span class="bg-white/50 px-4 py-1.5 rounded-full text-sm text-gray-500 border border-gray-100">Games</span>
-      <span class="bg-white/50 px-4 py-1.5 rounded-full text-sm text-gray-500 border border-gray-100">Tools</span>
+      <span class="bg-white/80 px-4 py-1.5 rounded-full text-sm font-medium text-gray-700 shadow-sm border border-gray-100 cursor-pointer">All apps</span>
+      <span class="bg-white/50 px-4 py-1.5 rounded-full text-sm text-gray-500 border border-gray-100 cursor-pointer">Productivity</span>
+      <span class="bg-white/50 px-4 py-1.5 rounded-full text-sm text-gray-500 border border-gray-100 cursor-pointer">Games</span>
+      <span class="bg-white/50 px-4 py-1.5 rounded-full text-sm text-gray-500 border border-gray-100 cursor-pointer">Tools</span>
     </div>
 
     <div id="loadingSkeletons" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">
@@ -75,19 +84,18 @@
     <div id="emptyState" class="hidden flex-col items-center justify-center py-20 text-center">
       <div class="text-6xl mb-4">📭</div>
       <h3 class="text-xl font-semibold text-gray-700">No apps available</h3>
-      <p class="text-gray-500 mt-1">Add data to your Google Sheet!</p>
+      <p class="text-gray-500 mt-1">Add your SK Web App data to Google Sheet!</p>
     </div>
 
     <div id="noResults" class="hidden flex-col items-center justify-center py-16 text-center">
       <div class="text-6xl mb-4">🔍</div>
-      <h3 class="text-xl font-semibold text-gray-700">No apps found</h3>
-      <p class="text-gray-500 mt-1">Try a different search term</p>
+      <h3 class="text-xl font-semibold text-gray-700">No results for your search</h3>
+      <p class="text-gray-500 mt-1">Try searching for "SK Shop" or other tools.</p>
     </div>
 
   </div>
 
   <script>
-    // PASTE YOUR GOOGLE SCRIPT WEB APP URL HERE
     const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwCI1990UHR_q1TZSq7kqjGU3Ne6fADvk7Gxm_Ey-5pJvi-NY6E-K9AYUrlNuX0n6IH/exec";
 
     const grid = document.getElementById('appsGrid');
@@ -115,7 +123,6 @@
       grid.innerHTML = '';
       
       appsToRender.forEach((app, index) => {
-        // Skip empty rows from Google Sheet if any
         if(!app.name) return; 
         const card = createAppCard(app, index);
         grid.appendChild(card);
@@ -129,9 +136,8 @@
       
       const name = app.name || 'Untitled';
       const category = app.category || 'App';
-      const description = app.description || 'No description available.';
+      const description = app.description || 'Professional digital service by SK.';
       
-      // Setup icon with a reliable fallback
       let icon = app.icon ? app.icon.trim() : '';
       const fallbackIcon = `https://placehold.co/100x100/8b5cf6/ffffff?text=${encodeURIComponent(name.charAt(0))}`;
       if(!icon) icon = fallbackIcon;
@@ -151,10 +157,10 @@
         </div>
         <p class="text-sm text-gray-600 mt-4 line-clamp-2 leading-relaxed">${description}</p>
         <div class="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center mt-auto">
-          <span class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Web App</span>
+          <span class="text-xs text-gray-400 uppercase tracking-wider font-semibold">SK Web App</span>
           <a href="${appUrl}" target="_blank" rel="noopener noreferrer" 
              class="inline-flex items-center gap-1 text-sm font-semibold text-purple-700 hover:text-white transition-colors bg-purple-50 px-4 py-2 rounded-xl hover:bg-purple-600">
-            Open App <span class="text-lg leading-4">↗</span>
+            Open <span class="text-lg leading-4">↗</span>
           </a>
         </div>
       `;
@@ -184,32 +190,28 @@
       clearBtn.classList.toggle('hidden', !t);
     }
     
-    // Fetch data from Google Sheets API
     async function loadAppsFromSheet() {
       try {
         const response = await fetch(GOOGLE_SHEET_API_URL);
         const data = await response.json();
         
         loadingSkeletons.classList.add('hidden');
-        
         allApps = data;
         
         if (allApps.length === 0) {
           emptyState.classList.remove('hidden');
         } else {
           filteredApps = [...allApps];
-          // Reverse array to show newest additions first
           renderApps(filteredApps.reverse());
         }
       } catch (error) {
         console.error('Failed to load from Google Sheets:', error);
         loadingSkeletons.classList.add('hidden');
         emptyState.classList.remove('hidden');
-        emptyState.innerHTML = `<div class="text-6xl mb-4">⚠️</div><h3 class="text-xl font-semibold text-gray-700">Connection error</h3><p class="text-gray-500">Failed to connect to Google Sheets API</p>`;
+        emptyState.innerHTML = `<div class="text-6xl mb-4">⚠️</div><h3 class="text-xl font-semibold text-gray-700">Connection error</h3><p class="text-gray-500">Could not fetch SK Shop data.</p>`;
       }
     }
     
-    // Event Listeners
     searchInput.addEventListener('input', (e) => filterApps(e.target.value));
     clearBtn.addEventListener('click', () => {
       searchInput.value = '';
@@ -217,7 +219,6 @@
       searchInput.focus();
     });
 
-    // Start fetching when page loads
     loadAppsFromSheet();
   </script>
 </body>
