@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SK.SHOP · Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --primary: #4f46e5; --primary-hover: #4338ca; --danger: #dc2626; --danger-hover: #b91c1c; --bg: #f8fafc; --surface: #ffffff; --text-main: #0f172a; --text-muted: #64748b; --border: #e2e8f0; --radius: 12px; --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-main); line-height: 1.5; padding: 2rem; }
+    .hidden { display: none !important; }
+    .container { max-width: 900px; margin: 0 auto; }
+    
+    .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; background: var(--surface); padding: 1.5rem 2rem; border-radius: var(--radius); box-shadow: var(--shadow); }
+    .admin-header h1 { font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    .badge { font-size: 0.75rem; font-weight: 600; background: #ede9fe; color: var(--primary); padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
+    
+    button { cursor: pointer; font-family: inherit; font-weight: 500; transition: all 0.2s ease; border-radius: 8px; border: none; }
+    .btn-logout { background: #f1f5f9; padding: 8px 16px; } .btn-logout:hover { background: #e2e8f0; }
+    .btn-primary { background: var(--primary); color: white; padding: 10px 20px; width: 100%; } .btn-primary:hover { background: var(--primary-hover); }
+    .btn-secondary { background: #f1f5f9; padding: 10px 20px; width: 100%; } .btn-secondary:hover { background: #e2e8f0; }
+    .btn-danger { background: var(--danger); color: white; padding: 10px 20px; width: 100%; } .btn-danger:hover { background: var(--danger-hover); }
+
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+    .card-option { background: var(--surface); border: 2px dashed var(--border); border-radius: var(--radius); padding: 3rem 2rem; text-align: center; cursor: pointer; transition: all 0.2s ease; }
+    .card-option:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: var(--shadow); }
+
+    #cardsListSection { background: var(--surface); border-radius: var(--radius); padding: 2rem; box-shadow: var(--shadow); margin-top: 1.5rem; }
+    .section-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+    
+    .card-list-item { display: flex; align-items: center; gap: 1rem; padding: 1rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem; }
+    .card-list-item img { width: 48px; height: 48px; border-radius: 10px; object-fit: cover; }
+    .card-list-info { flex: 1; }
+    .card-list-info strong { display: block; font-size: 1rem; }
+    .card-list-info span { font-size: 0.85rem; color: var(--text-muted); }
+    .action-btns { display: flex; gap: 0.5rem; }
+    .icon-btn { background: #f8fafc; border: 1px solid var(--border); padding: 8px; border-radius: 6px; } .icon-btn:hover { background: #f1f5f9; }
+
+    .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 1rem; }
+    .modal-content { background: var(--surface); padding: 2rem; max-width: 450px; width: 100%; border-radius: var(--radius); }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.5rem; }
+    .form-control { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 8px; outline: none; }
+    .form-control:focus { border-color: var(--primary); }
+    .form-row { display: flex; gap: 1rem; margin-top: 1.5rem; }
+
+    .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--text-main); color: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: var(--shadow); z-index: 100; }
+  </style>
+</head>
+<body>
+
+<div class="container" id="adminPanel">
+  <div class="admin-header">
+    <h1>SK.SHOP <span class="badge">Admin Panel</span></h1>
+    <button id="logoutBtn" class="btn-logout">Logout</button>
+  </div>
+
+  <div class="cards-grid" id="optionsGrid">
+    <div id="addCardOption" class="card-option">
+      <h2 style="font-size: 2rem; margin-bottom: 10px;">✨</h2><h2>Add New App</h2>
+      <p>Publish a new app to your store</p>
+    </div>
+    <div id="seeCardsOption" class="card-option">
+      <h2 style="font-size: 2rem; margin-bottom: 10px;">📦</h2><h2>Manage Apps</h2>
+      <p>View, edit or delete existing apps</p>
+    </div>
+  </div>
+
+  <div id="cardsListSection" class="hidden">
+    <div class="section-header">
+      <h3 style="font-size: 1.25rem;">Your Uploaded Apps</h3>
+      <button id="backToOptionsBtn" style="background:none;">← Back to Dashboard</button>
+    </div>
+    <div id="cardsContainer"><div style="padding:2rem;text-align:center;color:var(--text-muted);">Loading apps...</div></div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+</div>
+
+<div id="cardModal" class="modal hidden">
+  <div class="modal-content">
+    <div style="display:flex; justify-content:space-between; margin-bottom:1.5rem;">
+      <h2 id="modalTitle">Add New App</h2>
+      <button id="closeModalBtn" style="background:none;font-size:1.5rem;">&times;</button>
+    </div>
+    <form id="cardForm">
+      <input type="hidden" id="cardId">
+      <div class="form-group"><label>App Name *</label><input type="text" id="appName" class="form-control" required></div>
+      <div class="form-group"><label>Category</label><input type="text" id="appCategory" class="form-control"></div>
+      <div class="form-group"><label>Description</label><textarea id="appDesc" rows="3" class="form-control"></textarea></div>
+      <div class="form-group"><label>Icon URL</label><input type="url" id="appIcon" class="form-control"></div>
+      <div class="form-group"><label>App URL *</label><input type="url" id="appUrl" class="form-control" required></div>
+      <div class="form-row">
+        <button type="button" id="cancelModalBtn" class="btn-secondary">Cancel</button>
+        <button type="submit" id="saveBtn" class="btn-primary">Save App</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="deleteModal" class="modal hidden">
+  <div class="modal-content" style="text-align:center;">
+    <h3 style="margin-bottom:1rem;">Delete App?</h3>
+    <p style="margin-bottom:1.5rem;">Are you sure you want to delete <strong id="deleteAppName"></strong>?</p>
+    <div class="form-row">
+      <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
+      <button id="confirmDeleteBtn" class="btn-danger">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ----- AUTH GUARD -----
+  if (sessionStorage.getItem('sk_shop_auth') !== 'true') { window.location.href = 'pass.html'; }
+
+  // PASTE YOUR GOOGLE SCRIPT URL HERE
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwCI1990UHR_q1TZSq7kqjGU3Ne6fADvk7Gxm_Ey-5pJvi-NY6E-K9AYUrlNuX0n6IH/exec";
+
+  let appsData = [];
+  let currentDeleteId = null;
+
+  // UI Elements
+  const toast = document.getElementById('toast');
+  const cardsContainer = document.getElementById('cardsContainer');
+
+  function showToast(msg, isErr = false) {
+    toast.textContent = msg;
+    toast.classList.remove('hidden');
+    toast.style.background = isErr ? 'var(--danger)' : 'var(--text-main)';
+    setTimeout(() => toast.classList.add('hidden'), 3000);
+  }
+
+  // API Call to Google Sheets (POST for Add/Edit/Delete)
+  async function sheetAPI(payload) {
+    try {
+      const res = await fetch(SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify(payload)
+      });
+      return await res.json();
+    } catch(e) {
+      showToast('Network error!', true);
+      throw e;
+    }
+  }
+
+  // Fetch Data (GET)
+  async function loadApps() {
+    cardsContainer.innerHTML = '<div style="padding:2rem;text-align:center;">Loading...</div>';
+    try {
+      const res = await fetch(SCRIPT_URL);
+      appsData = await res.json();
+      renderCards();
+    } catch(e) {
+      cardsContainer.innerHTML = '<div style="color:red; text-align:center;">Failed to load.</div>';
+    }
+  }
+
+  // Render Apps in Admin
+  function renderCards() {
+    if (!appsData.length || !appsData[0].name) {
+      cardsContainer.innerHTML = '<div style="text-align:center;padding:2rem;">No apps uploaded yet.</div>';
+      return;
+    }
+    cardsContainer.innerHTML = appsData.map(c => `
+      <div class="card-list-item">
+        <img src="${c.icon || `https://placehold.co/100/4f46e5/fff?text=${c.name.charAt(0)}`}">
+        <div class="card-list-info">
+          <strong>${c.name}</strong><span>${c.category}</span>
+        </div>
+        <div class="action-btns">
+          <button class="icon-btn edit-btn" data-id="${c.id}">✏️</button>
+          <button class="icon-btn delete-btn" data-id="${c.id}" data-name="${c.name}">🗑️</button>
+        </div>
+      </div>`).join('');
+
+    document.querySelectorAll('.edit-btn').forEach(b => b.addEventListener('click', () => {
+      const app = appsData.find(a => a.id == b.dataset.id);
+      openModal(app);
+    }));
+    document.querySelectorAll('.delete-btn').forEach(b => b.addEventListener('click', () => {
+      currentDeleteId = b.dataset.id;
+      document.getElementById('deleteAppName').textContent = b.dataset.name;
+      document.getElementById('deleteModal').classList.remove('hidden');
+    }));
+  }
+
+  // Add / Edit Action
+  document.getElementById('cardForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('saveBtn');
+    btn.textContent = "Saving..."; btn.disabled = true;
+
+    const payload = {
+      action: document.getElementById('cardId').value ? 'edit' : 'add',
+      id: document.getElementById('cardId').value,
+      name: document.getElementById('appName').value,
+      category: document.getElementById('appCategory').value,
+      description: document.getElementById('appDesc').value,
+      icon: document.getElementById('appIcon').value,
+      appUrl: document.getElementById('appUrl').value
+    };
+
+    await sheetAPI(payload);
+    showToast('Saved successfully!');
+    document.getElementById('cardModal').classList.add('hidden');
+    btn.textContent = "Save App"; btn.disabled = false;
+    loadApps();
+  });
+
+  // Delete Action
+  document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('confirmDeleteBtn');
+    btn.textContent = "Deleting..."; btn.disabled = true;
+    
+    await sheetAPI({ action: 'delete', id: currentDeleteId });
+    showToast('App deleted');
+    document.getElementById('deleteModal').classList.add('hidden');
+    btn.textContent = "Yes, Delete"; btn.disabled = false;
+    loadApps();
+  });
+
+  // Navigation & Modals
+  function openModal(app=null) {
+    document.getElementById('cardForm').reset();
+    document.getElementById('modalTitle').textContent = app ? 'Edit App' : 'Add New App';
+    if(app) {
+      document.getElementById('cardId').value = app.id;
+      document.getElementById('appName').value = app.name;
+      document.getElementById('appCategory').value = app.category;
+      document.getElementById('appDesc').value = app.description;
+      document.getElementById('appIcon').value = app.icon;
+      document.getElementById('appUrl').value = app.appUrl;
+    } else { document.getElementById('cardId').value = ""; }
+    document.getElementById('cardModal').classList.remove('hidden');
+  }
+
+  document.getElementById('addCardOption').addEventListener('click', () => openModal());
+  document.getElementById('seeCardsOption').addEventListener('click', () => {
+    document.getElementById('optionsGrid').classList.add('hidden');
+    document.getElementById('cardsListSection').classList.remove('hidden');
+    loadApps();
+  });
+  document.getElementById('backToOptionsBtn').addEventListener('click', () => {
+    document.getElementById('cardsListSection').classList.add('hidden');
+    document.getElementById('optionsGrid').classList.remove('hidden');
+  });
+
+  document.getElementById('closeModalBtn').addEventListener('click', () => document.getElementById('cardModal').classList.add('hidden'));
+  document.getElementById('cancelModalBtn').addEventListener('click', () => document.getElementById('cardModal').classList.add('hidden'));
+  document.getElementById('cancelDeleteBtn').addEventListener('click', () => document.getElementById('deleteModal').classList.add('hidden'));
+  document.getElementById('logoutBtn').addEventListener('click', () => { sessionStorage.removeItem('sk_shop_auth'); window.location.href = 'pass.html'; });
+</script>
+</body>
+</html>
