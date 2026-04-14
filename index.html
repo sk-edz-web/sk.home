@@ -9,7 +9,7 @@
   <meta name="keywords" content="SK Shop, SK Web App, Sarathi Kannan, Web Developer Trichy, Digital Menu App, SK Web Store">
   <meta name="author" content="Sarathi Kannan">
 
-  <link rel="icon" type="image/png" href="https://iili.io/BNrknup.jpg">
+  <link rel="icon" href="https://iili.io/BNrknup.jpg">
   <link rel="apple-touch-icon" href="https://iili.io/BNrknup.jpg">
 
   <script src="https://cdn.tailwindcss.com"></script>
@@ -23,6 +23,7 @@
     .app-card {
       animation: cardPop 0.3s cubic-bezier(0.2, 0.9, 0.4, 1) forwards;
       opacity: 0;
+      cursor: pointer; /* Pointer add panni irukan */
     }
     .hover-lift { transition: all 0.25s ease; }
     .hover-lift:hover {
@@ -39,6 +40,9 @@
       animation: shimmer 1.5s infinite;
     }
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    
+    /* Hide scrollbar when modal is open */
+    body.modal-open { overflow: hidden; }
   </style>
 </head>
 <body class="antialiased text-gray-800">
@@ -47,7 +51,7 @@
     
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
       <div class="flex items-center">
-        <img src="logo.png" alt="SK Shop Logo" class="w-10 h-10 mr-3 rounded-lg shadow-sm" onerror="this.style.display='none'">
+        <img src="https://iili.io/BNrknup.jpg" alt="SK Shop Logo" class="w-12 h-12 mr-3 rounded-xl shadow-sm object-cover" onerror="this.style.display='none'">
         <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight">
           <span class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent animate-pulse" style="animation-duration: 4s;">
             SK.SHOP
@@ -95,6 +99,36 @@
 
   </div>
 
+  <div id="appModal" class="fixed inset-0 z-50 hidden bg-gray-900/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl transform translate-y-full sm:translate-y-0 sm:scale-95 transition-all duration-300 relative flex flex-col modal-content">
+      
+      <button id="closeModal" class="absolute top-4 right-4 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full p-2.5 transition-colors z-10">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+      
+      <div class="p-6 sm:p-8 pt-10">
+        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+          <img id="modalIcon" src="" class="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl shadow-md object-cover border border-gray-100">
+          <div class="text-center sm:text-left mt-3 sm:mt-0 flex-1">
+            <h2 id="modalTitle" class="text-3xl font-extrabold text-gray-900 mb-2"></h2>
+            <span id="modalCategory" class="inline-block bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4"></span>
+          </div>
+        </div>
+        
+        <div class="mt-8 border-t border-gray-100 pt-6">
+          <h3 class="text-lg font-bold text-gray-900 mb-3">About this App</h3>
+          <p id="modalDesc" class="text-gray-600 leading-relaxed text-base sm:text-lg"></p>
+        </div>
+        
+        <div class="mt-8 pt-4 pb-2">
+          <a id="modalLink" href="#" target="_blank" rel="noopener noreferrer" class="block w-full text-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl hover:opacity-90 transition-all duration-200 text-lg">
+            Open Web App 🚀
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwCI1990UHR_q1TZSq7kqjGU3Ne6fADvk7Gxm_Ey-5pJvi-NY6E-K9AYUrlNuX0n6IH/exec";
 
@@ -104,6 +138,11 @@
     const noResults = document.getElementById('noResults');
     const searchInput = document.getElementById('searchInput');
     const clearBtn = document.getElementById('clearSearch');
+    
+    // Modal Elements
+    const modal = document.getElementById('appModal');
+    const modalContent = modal.querySelector('.modal-content');
+    const closeBtn = document.getElementById('closeModal');
     
     let allApps = [];
     let filteredApps = [];
@@ -131,7 +170,7 @@
     
     function createAppCard(app, idx) {
       const card = document.createElement('div');
-      card.className = 'app-card bg-white rounded-2xl p-5 shadow-md border border-gray-100/80 hover-lift flex flex-col h-full';
+      card.className = 'app-card bg-white rounded-2xl p-5 shadow-sm border border-gray-100/80 hover-lift flex flex-col h-full';
       card.style.animationDelay = `${idx * 0.03}s`;
       
       const name = app.name || 'Untitled';
@@ -142,10 +181,8 @@
       const fallbackIcon = `https://placehold.co/100x100/8b5cf6/ffffff?text=${encodeURIComponent(name.charAt(0))}`;
       if(!icon) icon = fallbackIcon;
 
-      const appUrl = app.appUrl || '#';
-      
       card.innerHTML = `
-        <div class="flex items-start gap-4">
+        <div class="flex items-start gap-4 pointer-events-none">
           <div class="relative flex-shrink-0">
             <img src="${icon}" alt="${name}" class="w-16 h-16 rounded-xl object-cover shadow-sm border border-gray-100" 
                  onerror="this.onerror=null; this.src='${fallbackIcon}';">
@@ -155,18 +192,69 @@
             <p class="text-sm text-purple-600 font-medium capitalize mt-1">${category}</p>
           </div>
         </div>
-        <p class="text-sm text-gray-600 mt-4 line-clamp-2 leading-relaxed">${description}</p>
-        <div class="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center mt-auto">
+        <p class="text-sm text-gray-600 mt-4 line-clamp-2 leading-relaxed pointer-events-none">${description}</p>
+        <div class="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center mt-auto pointer-events-none">
           <span class="text-xs text-gray-400 uppercase tracking-wider font-semibold">SK Web App</span>
-          <a href="${appUrl}" target="_blank" rel="noopener noreferrer" 
-             class="inline-flex items-center gap-1 text-sm font-semibold text-purple-700 hover:text-white transition-colors bg-purple-50 px-4 py-2 rounded-xl hover:bg-purple-600">
-            Open <span class="text-lg leading-4">↗</span>
-          </a>
+          <span class="inline-flex items-center gap-1 text-sm font-semibold text-purple-700 bg-purple-50 px-3 py-1.5 rounded-lg">
+            View Details
+          </span>
         </div>
       `;
+      
+      // Card click event triggers the modal
+      card.addEventListener('click', () => openModal(app, icon, fallbackIcon));
+      
       return card;
     }
     
+    // --- MODAL LOGIC START ---
+    function openModal(app, icon, fallbackIcon) {
+      document.body.classList.add('modal-open'); // Prevent background scrolling
+      
+      document.getElementById('modalTitle').textContent = app.name || 'Untitled';
+      document.getElementById('modalCategory').textContent = app.category || 'App';
+      document.getElementById('modalDesc').textContent = app.description || 'No description available.';
+      document.getElementById('modalLink').href = app.appUrl || '#';
+      document.getElementById('modalIcon').src = icon || fallbackIcon;
+      
+      modal.classList.remove('hidden');
+      
+      // Small delay to allow display:block to apply before animating opacity/transform
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        if(window.innerWidth >= 640) {
+          modalContent.classList.remove('sm:scale-95');
+        } else {
+          modalContent.classList.remove('translate-y-full');
+        }
+      }, 10);
+    }
+
+    function closeModal() {
+      document.body.classList.remove('modal-open');
+      modal.classList.add('opacity-0');
+      
+      if(window.innerWidth >= 640) {
+        modalContent.classList.add('sm:scale-95');
+      } else {
+        modalContent.classList.add('translate-y-full');
+      }
+      
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 300);
+    }
+
+    closeBtn.addEventListener('click', closeModal);
+    
+    // Close modal if clicked outside the white box
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+    // --- MODAL LOGIC END ---
+
     function filterApps(term) {
       const t = term.trim().toLowerCase();
       if (!t) {
