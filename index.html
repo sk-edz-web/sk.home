@@ -23,7 +23,7 @@
     .app-card {
       animation: cardPop 0.3s cubic-bezier(0.2, 0.9, 0.4, 1) forwards;
       opacity: 0;
-      cursor: pointer; /* Pointer add panni irukan */
+      cursor: pointer;
     }
     .hover-lift { transition: all 0.25s ease; }
     .hover-lift:hover {
@@ -49,6 +49,7 @@
 
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 md:py-8">
     
+    <!-- Header & Search -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
       <div class="flex items-center">
         <img src="https://iili.io/BNrknup.jpg" alt="SK Shop Logo" class="w-12 h-12 mr-3 rounded-xl shadow-sm object-cover" onerror="this.style.display='none'">
@@ -71,20 +72,21 @@
       </div>
     </div>
 
-    <div class="flex flex-wrap gap-2 mb-6">
-      <span class="bg-white/80 px-4 py-1.5 rounded-full text-sm font-medium text-gray-700 shadow-sm border border-gray-100 cursor-pointer">All apps</span>
-      <span class="bg-white/50 px-4 py-1.5 rounded-full text-sm text-gray-500 border border-gray-100 cursor-pointer">Productivity</span>
-      <span class="bg-white/50 px-4 py-1.5 rounded-full text-sm text-gray-500 border border-gray-100 cursor-pointer">Games</span>
-      <span class="bg-white/50 px-4 py-1.5 rounded-full text-sm text-gray-500 border border-gray-100 cursor-pointer">Tools</span>
+    <!-- Dynamic Category Filters Container -->
+    <div id="categoryFilters" class="flex flex-wrap gap-2 mb-6 transition-all duration-300">
+      <!-- "All apps" and Dynamic Categories will be injected here via JS -->
     </div>
 
+    <!-- Loading Skeleton -->
     <div id="loadingSkeletons" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">
       <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100/80"><div class="flex gap-4"><div class="shimmer w-16 h-16 rounded-xl"></div><div class="flex-1 space-y-2"><div class="shimmer h-5 w-3/4 rounded"></div><div class="shimmer h-3 w-1/2 rounded"></div></div></div></div>
       <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100/80 hidden sm:block"><div class="flex gap-4"><div class="shimmer w-16 h-16 rounded-xl"></div><div class="flex-1 space-y-2"><div class="shimmer h-5 w-3/4 rounded"></div><div class="shimmer h-3 w-1/2 rounded"></div></div></div></div>
     </div>
 
+    <!-- Apps Grid -->
     <div id="appsGrid" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6"></div>
 
+    <!-- States -->
     <div id="emptyState" class="hidden flex-col items-center justify-center py-20 text-center">
       <div class="text-6xl mb-4">📭</div>
       <h3 class="text-xl font-semibold text-gray-700">No apps available</h3>
@@ -93,12 +95,13 @@
 
     <div id="noResults" class="hidden flex-col items-center justify-center py-16 text-center">
       <div class="text-6xl mb-4">🔍</div>
-      <h3 class="text-xl font-semibold text-gray-700">No results for your search</h3>
-      <p class="text-gray-500 mt-1">Try searching for "SK Shop" or other tools.</p>
+      <h3 class="text-xl font-semibold text-gray-700">No results found</h3>
+      <p class="text-gray-500 mt-1">Try a different search or category.</p>
     </div>
 
   </div>
 
+  <!-- Modal -->
   <div id="appModal" class="fixed inset-0 z-50 hidden bg-gray-900/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 opacity-0 transition-opacity duration-300">
     <div class="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl transform translate-y-full sm:translate-y-0 sm:scale-95 transition-all duration-300 relative flex flex-col modal-content">
       
@@ -138,6 +141,7 @@
     const noResults = document.getElementById('noResults');
     const searchInput = document.getElementById('searchInput');
     const clearBtn = document.getElementById('clearSearch');
+    const categoryContainer = document.getElementById('categoryFilters');
     
     // Modal Elements
     const modal = document.getElementById('appModal');
@@ -146,6 +150,7 @@
     
     let allApps = [];
     let filteredApps = [];
+    let activeCategory = 'All apps'; // Default active category
     
     function renderApps(appsToRender) {
       if (!appsToRender || appsToRender.length === 0) {
@@ -201,15 +206,13 @@
         </div>
       `;
       
-      // Card click event triggers the modal
       card.addEventListener('click', () => openModal(app, icon, fallbackIcon));
-      
       return card;
     }
     
-    // --- MODAL LOGIC START ---
+    // --- MODAL LOGIC ---
     function openModal(app, icon, fallbackIcon) {
-      document.body.classList.add('modal-open'); // Prevent background scrolling
+      document.body.classList.add('modal-open');
       
       document.getElementById('modalTitle').textContent = app.name || 'Untitled';
       document.getElementById('modalCategory').textContent = app.category || 'App';
@@ -218,8 +221,6 @@
       document.getElementById('modalIcon').src = icon || fallbackIcon;
       
       modal.classList.remove('hidden');
-      
-      // Small delay to allow display:block to apply before animating opacity/transform
       setTimeout(() => {
         modal.classList.remove('opacity-0');
         if(window.innerWidth >= 640) {
@@ -239,45 +240,77 @@
       } else {
         modalContent.classList.add('translate-y-full');
       }
-      
-      setTimeout(() => {
-        modal.classList.add('hidden');
-      }, 300);
+      setTimeout(() => { modal.classList.add('hidden'); }, 300);
     }
 
     closeBtn.addEventListener('click', closeModal);
-    
-    // Close modal if clicked outside the white box
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        closeModal();
-      }
-    });
-    // --- MODAL LOGIC END ---
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 
-    function filterApps(term) {
-      const t = term.trim().toLowerCase();
-      if (!t) {
-        filteredApps = [...allApps];
-      } else {
-        filteredApps = allApps.filter(app => {
-          return (app.name || '').toLowerCase().includes(t) ||
-                 (app.description || '').toLowerCase().includes(t) ||
-                 (app.category || '').toLowerCase().includes(t);
-        });
-      }
+    // --- CATEGORY & FILTER LOGIC ---
+    
+    // Create Category Buttons Dynamically
+    function generateCategoryFilters() {
+      // Get unique categories from the DB
+      const uniqueCategories = [...new Set(allApps.map(app => app.category).filter(c => c))];
       
-      if (filteredApps.length === 0 && allApps.length > 0) {
-        grid.classList.add('hidden');
-        noResults.classList.remove('hidden');
-        emptyState.classList.add('hidden');
-      } else {
-        renderApps(filteredApps);
-      }
+      categoryContainer.innerHTML = ''; // Clear container
       
-      clearBtn.classList.toggle('hidden', !t);
+      // Default "All apps" Button
+      const allBtn = document.createElement('span');
+      allBtn.textContent = 'All apps';
+      allBtn.className = 'cat-btn bg-white/80 px-4 py-1.5 rounded-full text-sm font-medium text-gray-700 shadow-sm border border-gray-100 cursor-pointer transition-colors';
+      allBtn.onclick = () => setCategory('All apps');
+      categoryContainer.appendChild(allBtn);
+
+      // Unique Categories from Database
+      uniqueCategories.forEach(cat => {
+        const btn = document.createElement('span');
+        btn.textContent = cat;
+        btn.className = 'cat-btn bg-white/50 px-4 py-1.5 rounded-full text-sm text-gray-500 border border-gray-100 cursor-pointer hover:bg-white/80 transition-colors';
+        btn.onclick = () => setCategory(cat);
+        categoryContainer.appendChild(btn);
+      });
+    }
+
+    // Set Active Category and Update UI
+    function setCategory(category) {
+      activeCategory = category;
+      
+      // Update Button Styles
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        if (btn.textContent === category) {
+          btn.className = 'cat-btn bg-white/80 px-4 py-1.5 rounded-full text-sm font-medium text-gray-700 shadow-sm border border-gray-100 cursor-pointer transition-colors';
+        } else {
+          btn.className = 'cat-btn bg-white/50 px-4 py-1.5 rounded-full text-sm text-gray-500 border border-gray-100 cursor-pointer hover:bg-white/80 transition-colors';
+        }
+      });
+
+      applyFilters(); // Re-apply combined filter
+    }
+
+    // Combined Filter: Search Term + Category
+    function applyFilters() {
+      const term = searchInput.value.trim().toLowerCase();
+      
+      filteredApps = allApps.filter(app => {
+        // Search Match Logic
+        const matchesSearch = !term || (
+          (app.name || '').toLowerCase().includes(term) ||
+          (app.description || '').toLowerCase().includes(term) ||
+          (app.category || '').toLowerCase().includes(term)
+        );
+        
+        // Category Match Logic
+        const matchesCategory = activeCategory === 'All apps' || app.category === activeCategory;
+        
+        return matchesSearch && matchesCategory; // Must match both
+      });
+      
+      renderApps(filteredApps);
+      clearBtn.classList.toggle('hidden', !term);
     }
     
+    // --- INIT ---
     async function loadAppsFromSheet() {
       try {
         const response = await fetch(GOOGLE_SHEET_API_URL);
@@ -289,8 +322,9 @@
         if (allApps.length === 0) {
           emptyState.classList.remove('hidden');
         } else {
-          filteredApps = [...allApps];
-          renderApps(filteredApps.reverse());
+          allApps = allApps.reverse(); // Reverse if you want newest first
+          generateCategoryFilters();   // Build Categories UI from Database
+          applyFilters();              // Initial render with filters
         }
       } catch (error) {
         console.error('Failed to load from Google Sheets:', error);
@@ -300,10 +334,10 @@
       }
     }
     
-    searchInput.addEventListener('input', (e) => filterApps(e.target.value));
+    searchInput.addEventListener('input', applyFilters);
     clearBtn.addEventListener('click', () => {
       searchInput.value = '';
-      filterApps('');
+      applyFilters();
       searchInput.focus();
     });
 
