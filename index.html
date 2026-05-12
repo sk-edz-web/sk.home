@@ -4,10 +4,32 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   
-  <title>SK Shop | SK Web App - Professional Web Store</title>
-  <meta name="description" content="Welcome to SK Shop and SK Web App. We provide high-quality digital solutions, web development, and local services in Tiruchirappalli.">
-  <meta name="keywords" content="SK Shop, SK Web App, Sarathi Kannan, Web Developer Trichy, Digital Menu App, SK Web Store">
+  <!-- ==========================================
+       🔥 SK SHOP & SK EDZ PORTFOLIO SEO TAGS 🔥 
+       ========================================== -->
+  
+  <!-- Primary Meta Tags -->
+  <title>SK Shop | SK EDZ Portfolio & Web Apps</title>
+  <meta name="title" content="SK Shop | SK EDZ Portfolio & Web Apps">
+  <meta name="description" content="Welcome to SK Shop and the official SK EDZ Portfolio. Discover high-quality web applications, digital solutions, SaaS products, and professional web development projects by Sarathi Kannan.">
+  <meta name="keywords" content="sk shop, sk edz portfolio, sk edz, sk web app, sarathi kannan portfolio, sk store, web developer trichy, digital solutions, sk-commers, sk portfolio">
   <meta name="author" content="Sarathi Kannan">
+  <meta name="robots" content="index, follow"> <!-- Tells Google to crawl and index this site -->
+
+  <!-- Open Graph / Facebook (For Social Media & Better Search Indexing) -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://skshop.lol/"> <!-- Update with your actual domain if needed -->
+  <meta property="og:title" content="SK Shop | SK EDZ Portfolio">
+  <meta property="og:description" content="Explore the official SK Shop and SK EDZ Portfolio. High-quality web applications and digital services by Sarathi Kannan.">
+  <meta property="og:image" content="https://iili.io/BNrknup.jpg">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:title" content="SK Shop | SK EDZ Portfolio">
+  <meta property="twitter:description" content="Explore the official SK Shop and SK EDZ Portfolio. High-quality web applications and digital services.">
+  <meta property="twitter:image" content="https://iili.io/BNrknup.jpg">
+
+  <!-- ========================================== -->
 
   <link rel="icon" href="https://iili.io/BNrknup.jpg">
   <link rel="apple-touch-icon" href="https://iili.io/BNrknup.jpg">
@@ -41,7 +63,6 @@
     }
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     
-    /* Hide scrollbar when modal is open */
     body.modal-open { overflow: hidden; }
   </style>
 </head>
@@ -53,11 +74,15 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
       <div class="flex items-center">
         <img src="https://iili.io/BNrknup.jpg" alt="SK Shop Logo" class="w-12 h-12 mr-3 rounded-xl shadow-sm object-cover" onerror="this.style.display='none'">
-        <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight">
-          <span class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent animate-pulse" style="animation-duration: 4s;">
-            SK.SHOP
-          </span>
-        </h1>
+        <div>
+          <!-- Added SK EDZ text for SEO visibility inside the page structure -->
+          <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight">
+            <span class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent animate-pulse" style="animation-duration: 4s;">
+              SK.SHOP
+            </span>
+          </h1>
+          <p class="text-[10px] text-gray-400 font-medium uppercase tracking-widest mt-1">By SK EDZ Portfolio</p>
+        </div>
         <span class="ml-3 text-xs font-medium bg-purple-100 text-purple-700 px-2 py-1 rounded-full border border-purple-200">WEB STORE</span>
       </div>
       
@@ -73,9 +98,7 @@
     </div>
 
     <!-- Dynamic Category Filters Container -->
-    <div id="categoryFilters" class="flex flex-wrap gap-2 mb-6 transition-all duration-300">
-      <!-- "All apps" and Dynamic Categories will be injected here via JS -->
-    </div>
+    <div id="categoryFilters" class="flex flex-wrap gap-2 mb-6 transition-all duration-300"></div>
 
     <!-- Loading Skeleton -->
     <div id="loadingSkeletons" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">
@@ -143,14 +166,13 @@
     const clearBtn = document.getElementById('clearSearch');
     const categoryContainer = document.getElementById('categoryFilters');
     
-    // Modal Elements
     const modal = document.getElementById('appModal');
     const modalContent = modal.querySelector('.modal-content');
     const closeBtn = document.getElementById('closeModal');
     
     let allApps = [];
     let filteredApps = [];
-    let activeCategory = 'All apps'; // Default active category
+    let activeCategory = 'All apps';
     
     function renderApps(appsToRender) {
       if (!appsToRender || appsToRender.length === 0) {
@@ -159,11 +181,9 @@
         emptyState.classList.add('hidden');
         return;
       }
-      
       noResults.classList.add('hidden');
       emptyState.classList.add('hidden');
       grid.classList.remove('hidden');
-      
       grid.innerHTML = '';
       
       appsToRender.forEach((app, index) => {
@@ -205,15 +225,12 @@
           </span>
         </div>
       `;
-      
       card.addEventListener('click', () => openModal(app, icon, fallbackIcon));
       return card;
     }
     
-    // --- MODAL LOGIC ---
     function openModal(app, icon, fallbackIcon) {
       document.body.classList.add('modal-open');
-      
       document.getElementById('modalTitle').textContent = app.name || 'Untitled';
       document.getElementById('modalCategory').textContent = app.category || 'App';
       document.getElementById('modalDesc').textContent = app.description || 'No description available.';
@@ -223,46 +240,32 @@
       modal.classList.remove('hidden');
       setTimeout(() => {
         modal.classList.remove('opacity-0');
-        if(window.innerWidth >= 640) {
-          modalContent.classList.remove('sm:scale-95');
-        } else {
-          modalContent.classList.remove('translate-y-full');
-        }
+        if(window.innerWidth >= 640) { modalContent.classList.remove('sm:scale-95'); } 
+        else { modalContent.classList.remove('translate-y-full'); }
       }, 10);
     }
 
     function closeModal() {
       document.body.classList.remove('modal-open');
       modal.classList.add('opacity-0');
-      
-      if(window.innerWidth >= 640) {
-        modalContent.classList.add('sm:scale-95');
-      } else {
-        modalContent.classList.add('translate-y-full');
-      }
+      if(window.innerWidth >= 640) { modalContent.classList.add('sm:scale-95'); } 
+      else { modalContent.classList.add('translate-y-full'); }
       setTimeout(() => { modal.classList.add('hidden'); }, 300);
     }
 
     closeBtn.addEventListener('click', closeModal);
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 
-    // --- CATEGORY & FILTER LOGIC ---
-    
-    // Create Category Buttons Dynamically
     function generateCategoryFilters() {
-      // Get unique categories from the DB
       const uniqueCategories = [...new Set(allApps.map(app => app.category).filter(c => c))];
+      categoryContainer.innerHTML = ''; 
       
-      categoryContainer.innerHTML = ''; // Clear container
-      
-      // Default "All apps" Button
       const allBtn = document.createElement('span');
       allBtn.textContent = 'All apps';
       allBtn.className = 'cat-btn bg-white/80 px-4 py-1.5 rounded-full text-sm font-medium text-gray-700 shadow-sm border border-gray-100 cursor-pointer transition-colors';
       allBtn.onclick = () => setCategory('All apps');
       categoryContainer.appendChild(allBtn);
 
-      // Unique Categories from Database
       uniqueCategories.forEach(cat => {
         const btn = document.createElement('span');
         btn.textContent = cat;
@@ -272,11 +275,8 @@
       });
     }
 
-    // Set Active Category and Update UI
     function setCategory(category) {
       activeCategory = category;
-      
-      // Update Button Styles
       document.querySelectorAll('.cat-btn').forEach(btn => {
         if (btn.textContent === category) {
           btn.className = 'cat-btn bg-white/80 px-4 py-1.5 rounded-full text-sm font-medium text-gray-700 shadow-sm border border-gray-100 cursor-pointer transition-colors';
@@ -284,50 +284,38 @@
           btn.className = 'cat-btn bg-white/50 px-4 py-1.5 rounded-full text-sm text-gray-500 border border-gray-100 cursor-pointer hover:bg-white/80 transition-colors';
         }
       });
-
-      applyFilters(); // Re-apply combined filter
+      applyFilters(); 
     }
 
-    // Combined Filter: Search Term + Category
     function applyFilters() {
       const term = searchInput.value.trim().toLowerCase();
-      
       filteredApps = allApps.filter(app => {
-        // Search Match Logic
         const matchesSearch = !term || (
           (app.name || '').toLowerCase().includes(term) ||
           (app.description || '').toLowerCase().includes(term) ||
           (app.category || '').toLowerCase().includes(term)
         );
-        
-        // Category Match Logic
         const matchesCategory = activeCategory === 'All apps' || app.category === activeCategory;
-        
-        return matchesSearch && matchesCategory; // Must match both
+        return matchesSearch && matchesCategory; 
       });
-      
       renderApps(filteredApps);
       clearBtn.classList.toggle('hidden', !term);
     }
     
-    // --- INIT ---
     async function loadAppsFromSheet() {
       try {
         const response = await fetch(GOOGLE_SHEET_API_URL);
         const data = await response.json();
-        
         loadingSkeletons.classList.add('hidden');
         allApps = data;
-        
         if (allApps.length === 0) {
           emptyState.classList.remove('hidden');
         } else {
-          allApps = allApps.reverse(); // Reverse if you want newest first
-          generateCategoryFilters();   // Build Categories UI from Database
-          applyFilters();              // Initial render with filters
+          allApps = allApps.reverse(); 
+          generateCategoryFilters();   
+          applyFilters();              
         }
       } catch (error) {
-        console.error('Failed to load from Google Sheets:', error);
         loadingSkeletons.classList.add('hidden');
         emptyState.classList.remove('hidden');
         emptyState.innerHTML = `<div class="text-6xl mb-4">⚠️</div><h3 class="text-xl font-semibold text-gray-700">Connection error</h3><p class="text-gray-500">Could not fetch SK Shop data.</p>`;
